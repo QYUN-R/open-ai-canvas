@@ -1,7 +1,43 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Segmented, Switch } from "antd";
-import { Box, Camera, CircleDot, Clapperboard, Eraser, FileText, Film, FolderOpen, GitBranch, Grid2x2, Hand, History, Image as ImageIcon, Info, Layers3, Map, Mic2, Moon, Music2, Palette, PanelTop, Plus, Redo2, Square, StickyNote, Sun, Trash2, Type, Undo2, UploadCloud, UserRound, Video, WandSparkles, X } from "lucide-react";
+import {
+    Box,
+    Camera,
+    CircleDot,
+    Clapperboard,
+    Eraser,
+    FileText,
+    Film,
+    FolderOpen,
+    GitBranch,
+    Grid2x2,
+    Hand,
+    History,
+    Image as ImageIcon,
+    Info,
+    Layers3,
+    Map,
+    Mic2,
+    Moon,
+    Music2,
+    Palette,
+    PanelTop,
+    Plus,
+    Redo2,
+    Square,
+    StickyNote,
+    Sun,
+    Trash2,
+    Type,
+    Undo2,
+    UploadCloud,
+    UserRound,
+    Video,
+    WandSparkles,
+    Workflow,
+    X,
+} from "lucide-react";
 
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { SpotlightSurface } from "@/components/ui/aceternity/spotlight-surface";
@@ -23,6 +59,7 @@ export function CanvasToolbar({
     onAddAudio,
     onAddText,
     onAddNovel,
+    onCreatePipeline,
     onChooseStyle,
     onAddScript,
     onAddFrame,
@@ -49,6 +86,7 @@ export function CanvasToolbar({
     onAddAudio: () => void;
     onAddText: () => void;
     onAddNovel: () => void;
+    onCreatePipeline: () => void;
     onChooseStyle: () => void;
     onAddScript: () => void;
     onAddFrame: () => void;
@@ -90,13 +128,35 @@ export function CanvasToolbar({
 
     return (
         <div ref={rootRef} data-canvas-no-zoom className="pointer-events-none absolute bottom-4 left-4 top-[76px] z-50 flex items-start gap-2">
-            <div className="pointer-events-auto flex w-14 flex-col items-center gap-1 rounded-lg border p-2 backdrop-blur-2xl" style={{ background: theme.spatial.elevated, borderColor: theme.toolbar.border, boxShadow: `0 22px 64px ${theme.spatial.shadow}` }}>
+            <div
+                className="pointer-events-auto flex w-14 flex-col items-center gap-1 rounded-lg border p-2 backdrop-blur-2xl"
+                style={{ background: theme.spatial.elevated, borderColor: theme.toolbar.border, boxShadow: `0 22px 64px ${theme.spatial.shadow}` }}
+            >
                 <RailButton active={!selectedCount} icon={selectedCount ? <X /> : <Hand />} label={selectedCount ? `取消选择 ${selectedCount}` : "移动与选择"} theme={theme} onClick={onDeselect} />
                 <RailSeparator theme={theme} />
-                <RailButton active={addOpen} primary icon={<Plus />} label="添加节点" theme={theme} onClick={() => { setAppearanceOpen(false); setAddOpen((value) => !value); }} />
+                <RailButton
+                    active={addOpen}
+                    primary
+                    icon={<Plus />}
+                    label="添加节点"
+                    theme={theme}
+                    onClick={() => {
+                        setAppearanceOpen(false);
+                        setAddOpen((value) => !value);
+                    }}
+                />
                 <RailButton icon={<UploadCloud />} label="上传" theme={theme} onClick={() => runAddAction(onUpload)} />
                 <RailButton icon={<FolderOpen />} label="素材库" theme={theme} onClick={() => runAddAction(onOpenMyAssets)} />
-                <RailButton active={appearanceOpen} icon={<Palette />} label="画布外观" theme={theme} onClick={() => { setAddOpen(false); setAppearanceOpen((value) => !value); }} />
+                <RailButton
+                    active={appearanceOpen}
+                    icon={<Palette />}
+                    label="画布外观"
+                    theme={theme}
+                    onClick={() => {
+                        setAddOpen(false);
+                        setAppearanceOpen((value) => !value);
+                    }}
+                />
                 <RailSeparator theme={theme} />
                 <RailButton icon={<Undo2 />} label="撤销" theme={theme} disabled={!canUndo} onClick={onUndo} />
                 <RailButton icon={<Redo2 />} label="重做" theme={theme} disabled={!canRedo} onClick={onRedo} />
@@ -112,6 +172,7 @@ export function CanvasToolbar({
                         workspaceMode={workspaceMode}
                         onAddText={() => runAddAction(onAddText)}
                         onAddNovel={() => runAddAction(onAddNovel)}
+                        onCreatePipeline={() => runAddAction(onCreatePipeline)}
                         onChooseStyle={() => runAddAction(onChooseStyle)}
                         onAddScript={() => runAddAction(onAddScript)}
                         onAddFrame={() => runAddAction(onAddFrame)}
@@ -129,12 +190,27 @@ export function CanvasToolbar({
             <AnimatePresence>
                 {appearanceOpen ? (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: aceternityMotion.duration.instant }} className="pointer-events-auto w-[244px]">
-                        <SpotlightSurface spotlightColor={theme.toolbar.itemHover} initial={{ x: -6, scale: 0.98 }} animate={{ x: 0, scale: 1 }} exit={{ x: -4, scale: 0.98 }} transition={{ duration: aceternityMotion.duration.instant, ease: aceternityMotion.easing.enter }} className="aceternity-floating-panel overflow-hidden rounded-lg border p-2.5 backdrop-blur-2xl" style={{ background: theme.spatial.elevated, borderColor: theme.toolbar.border, color: theme.toolbar.item, boxShadow: `0 24px 64px ${theme.spatial.shadow}` }} onWheel={(event) => event.stopPropagation()}>
+                        <SpotlightSurface
+                            spotlightColor={theme.toolbar.itemHover}
+                            initial={{ x: -6, scale: 0.98 }}
+                            animate={{ x: 0, scale: 1 }}
+                            exit={{ x: -4, scale: 0.98 }}
+                            transition={{ duration: aceternityMotion.duration.instant, ease: aceternityMotion.easing.enter }}
+                            className="aceternity-floating-panel overflow-hidden rounded-lg border p-2.5 backdrop-blur-2xl"
+                            style={{ background: theme.spatial.elevated, borderColor: theme.toolbar.border, color: theme.toolbar.item, boxShadow: `0 24px 64px ${theme.spatial.shadow}` }}
+                            onWheel={(event) => event.stopPropagation()}
+                        >
                             <PanelHeading icon={<Palette className="size-4" />} title="画布外观" subtitle="网格、主题和媒体信息" theme={theme} />
                             <div className="mt-3 text-[9px] font-semibold uppercase opacity-45">主题模式</div>
                             <div className="mt-1 grid grid-cols-2 gap-1 rounded-md border p-1" style={{ background: theme.spatial.surface, borderColor: theme.toolbar.border }}>
-                                <CanvasThemeButton colorTheme={colorTheme} targetTheme="light" onThemeChange={setTheme}><Sun className="size-3.5" />浅色</CanvasThemeButton>
-                                <CanvasThemeButton colorTheme={colorTheme} targetTheme="dark" onThemeChange={setTheme}><Moon className="size-3.5" />深色</CanvasThemeButton>
+                                <CanvasThemeButton colorTheme={colorTheme} targetTheme="light" onThemeChange={setTheme}>
+                                    <Sun className="size-3.5" />
+                                    浅色
+                                </CanvasThemeButton>
+                                <CanvasThemeButton colorTheme={colorTheme} targetTheme="dark" onThemeChange={setTheme}>
+                                    <Moon className="size-3.5" />
+                                    深色
+                                </CanvasThemeButton>
                             </div>
                             <div className="mt-3 text-[9px] font-semibold uppercase opacity-45">空间网格</div>
                             <Segmented
@@ -142,13 +218,38 @@ export function CanvasToolbar({
                                 value={backgroundMode}
                                 onChange={(value) => onBackgroundModeChange(value as CanvasBackgroundMode)}
                                 options={[
-                                    { value: "dots", label: <span className="inline-flex items-center gap-1.5"><CircleDot className="size-3.5" />点</span> },
-                                    { value: "lines", label: <span className="inline-flex items-center gap-1.5"><Grid2x2 className="size-3.5" />线</span> },
-                                    { value: "blank", label: <span className="inline-flex items-center gap-1.5"><Square className="size-3.5" />空白</span> },
+                                    {
+                                        value: "dots",
+                                        label: (
+                                            <span className="inline-flex items-center gap-1.5">
+                                                <CircleDot className="size-3.5" />点
+                                            </span>
+                                        ),
+                                    },
+                                    {
+                                        value: "lines",
+                                        label: (
+                                            <span className="inline-flex items-center gap-1.5">
+                                                <Grid2x2 className="size-3.5" />线
+                                            </span>
+                                        ),
+                                    },
+                                    {
+                                        value: "blank",
+                                        label: (
+                                            <span className="inline-flex items-center gap-1.5">
+                                                <Square className="size-3.5" />
+                                                空白
+                                            </span>
+                                        ),
+                                    },
                                 ]}
                             />
                             <div className="mt-2.5 flex items-center justify-between gap-2 rounded-md border px-2.5 py-2" style={{ background: theme.spatial.surface, borderColor: theme.toolbar.border }}>
-                                <span className="inline-flex min-w-0 items-center gap-1.5 text-[10px] font-semibold"><Info className="size-3" />图片信息</span>
+                                <span className="inline-flex min-w-0 items-center gap-1.5 text-[10px] font-semibold">
+                                    <Info className="size-3" />
+                                    图片信息
+                                </span>
                                 <Switch size="small" checked={showImageInfo} onChange={onShowImageInfoChange} />
                             </div>
                         </SpotlightSurface>
@@ -159,11 +260,28 @@ export function CanvasToolbar({
     );
 }
 
-function AddNodeMenu({ theme, workspaceMode, onAddText, onAddNovel, onChooseStyle, onAddScript, onAddFrame, onAddImage, onAddVideo, onAddAudio, onAddConfig, onOpenDirector, onUpload, onOpenAssets }: {
+function AddNodeMenu({
+    theme,
+    workspaceMode,
+    onAddText,
+    onAddNovel,
+    onCreatePipeline,
+    onChooseStyle,
+    onAddScript,
+    onAddFrame,
+    onAddImage,
+    onAddVideo,
+    onAddAudio,
+    onAddConfig,
+    onOpenDirector,
+    onUpload,
+    onOpenAssets,
+}: {
     theme: CanvasTheme;
     workspaceMode: CanvasWorkspaceMode;
     onAddText: () => void;
     onAddNovel: () => void;
+    onCreatePipeline: () => void;
     onChooseStyle: () => void;
     onAddScript: () => void;
     onAddFrame: () => void;
@@ -183,6 +301,7 @@ function AddNodeMenu({ theme, workspaceMode, onAddText, onAddNovel, onChooseStyl
         { id: "audio", label: "音频", description: "TTS / BGM / 音效", icon: <Music2 />, onClick: onAddAudio },
     ];
     const filmCommands: CanvasCreateCommand[] = [
+        { id: "film-workflow", label: "影视工作流", description: "故事到成片", icon: <Workflow />, badge: "入口", onClick: onCreatePipeline },
         { id: "script", label: "剧本", description: "剧本到分镜", icon: <Clapperboard />, badge: "核心", onClick: onAddScript },
         { id: "novel", label: "小说", description: "长文本拆解", icon: <FileText />, onClick: onAddNovel },
         { id: "style", label: "画风", description: "项目视觉规范", icon: <Palette />, onClick: onChooseStyle },
@@ -209,7 +328,16 @@ function AddNodeMenu({ theme, workspaceMode, onAddText, onAddNovel, onChooseStyl
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: aceternityMotion.duration.instant }} className="pointer-events-auto w-[360px] max-w-[calc(100vw-96px)]">
-            <SpotlightSurface spotlightColor={theme.toolbar.itemHover} initial={{ x: -8, scale: 0.98 }} animate={{ x: 0, scale: 1 }} exit={{ x: -5, scale: 0.98 }} transition={{ duration: aceternityMotion.duration.instant, ease: aceternityMotion.easing.enter }} className="aceternity-floating-panel thin-scrollbar max-h-[calc(100vh-180px)] overflow-y-auto rounded-lg border p-2.5 backdrop-blur-2xl" style={{ background: theme.spatial.elevated, borderColor: theme.toolbar.border, color: theme.node.text, boxShadow: `0 24px 64px ${theme.spatial.shadow}` }} onWheel={(event) => event.stopPropagation()}>
+            <SpotlightSurface
+                spotlightColor={theme.toolbar.itemHover}
+                initial={{ x: -8, scale: 0.98 }}
+                animate={{ x: 0, scale: 1 }}
+                exit={{ x: -5, scale: 0.98 }}
+                transition={{ duration: aceternityMotion.duration.instant, ease: aceternityMotion.easing.enter }}
+                className="aceternity-floating-panel thin-scrollbar max-h-[calc(100vh-180px)] overflow-y-auto rounded-lg border p-2.5 backdrop-blur-2xl"
+                style={{ background: theme.spatial.elevated, borderColor: theme.toolbar.border, color: theme.node.text, boxShadow: `0 24px 64px ${theme.spatial.shadow}` }}
+                onWheel={(event) => event.stopPropagation()}
+            >
                 <PanelHeading icon={<Plus className="size-4" />} title="添加节点" subtitle={workspaceMode === "professional" ? "完整影视工作台" : "完整模式已默认开启"} theme={theme} />
                 <MenuSection title="基础" />
                 <CanvasCreateCommandGrid commands={baseCommands} />
@@ -237,7 +365,12 @@ function RailButton({ active, danger, disabled, icon, label, primary, theme, onC
             title={label}
         >
             <span className="[&_svg]:size-4">{icon}</span>
-            <span className="pointer-events-none absolute left-[calc(100%+8px)] top-1/2 z-[140] hidden -translate-y-1/2 whitespace-nowrap rounded-md border px-2 py-1 text-[10px] font-medium shadow-xl backdrop-blur-xl group-hover:block" style={{ background: theme.spatial.elevated, borderColor: theme.toolbar.border, color: theme.node.text }}>{label}</span>
+            <span
+                className="pointer-events-none absolute left-[calc(100%+8px)] top-1/2 z-[140] hidden -translate-y-1/2 whitespace-nowrap rounded-md border px-2 py-1 text-[10px] font-medium shadow-xl backdrop-blur-xl group-hover:block"
+                style={{ background: theme.spatial.elevated, borderColor: theme.toolbar.border, color: theme.node.text }}
+            >
+                {label}
+            </span>
         </button>
     );
 }
@@ -249,8 +382,15 @@ function RailSeparator({ theme }: { theme: CanvasTheme }) {
 function PanelHeading({ icon, title, subtitle, theme }: { icon: ReactNode; title: string; subtitle: string; theme: CanvasTheme }) {
     return (
         <div className="flex items-center gap-2">
-            <span className="grid size-8 shrink-0 place-items-center rounded-md border opacity-75 [&_svg]:size-3.5" style={{ background: theme.spatial.surface, borderColor: theme.toolbar.border }}>{icon}</span>
-            <span className="min-w-0"><span className="block text-xs font-semibold">{title}</span><span className="mt-0.5 block text-[9px]" style={{ color: theme.node.muted }}>{subtitle}</span></span>
+            <span className="grid size-8 shrink-0 place-items-center rounded-md border opacity-75 [&_svg]:size-3.5" style={{ background: theme.spatial.surface, borderColor: theme.toolbar.border }}>
+                {icon}
+            </span>
+            <span className="min-w-0">
+                <span className="block text-xs font-semibold">{title}</span>
+                <span className="mt-0.5 block text-[9px]" style={{ color: theme.node.muted }}>
+                    {subtitle}
+                </span>
+            </span>
         </div>
     );
 }
