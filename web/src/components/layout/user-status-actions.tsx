@@ -7,6 +7,7 @@ import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { AppChangelogButton } from "@/components/layout/app-changelog-modal";
 import { SystemAnnouncementCenter } from "@/components/layout/system-announcement-center";
 import { canvasThemes } from "@/lib/canvas-theme";
+import { showCreditUi } from "@/lib/self-hosted-mode";
 import { applyUserSession } from "@/lib/user-session";
 import { useWalletBalance } from "@/hooks/use-wallet-balance";
 import { logout } from "@/services/api/auth";
@@ -29,7 +30,7 @@ export function UserStatusActions({ showConfig = true, variant = "default", onOp
     const navigate = useNavigate();
     const { message } = App.useApp();
     const canvasTheme = canvasThemes[theme];
-    const { availableMicrocredits } = useWalletBalance(user?.id, variant !== "canvas");
+    const { availableMicrocredits } = useWalletBalance(user?.id, showCreditUi && variant !== "canvas");
     const naturalIconClass = "inline-flex size-7 shrink-0 items-center justify-center text-stone-600 transition hover:text-stone-950 dark:text-stone-300 dark:hover:text-white [&_svg]:size-4";
     const announcementIconClass = "relative grid size-9 shrink-0 place-items-center rounded-full border border-stone-300/80 bg-white/80 text-stone-600 outline-none transition hover:border-stone-500 hover:text-stone-950 focus-visible:ring-2 focus-visible:ring-stone-500/50 dark:border-white/15 dark:bg-white/8 dark:text-stone-200 dark:hover:border-white/35 dark:hover:text-white";
     const iconStyle: CSSProperties | undefined = variant === "canvas" ? { color: canvasTheme.node.text } : undefined;
@@ -47,7 +48,7 @@ export function UserStatusActions({ showConfig = true, variant = "default", onOp
 
     return (
         <div className="inline-flex shrink-0 items-center gap-1">
-            {variant !== "canvas" && user && availableMicrocredits !== null ? (
+            {showCreditUi && variant !== "canvas" && user && availableMicrocredits !== null ? (
                 <Link to="/wallet" className="mr-1 inline-flex h-7 items-center gap-1 text-xs font-medium tabular-nums text-stone-600 transition hover:text-stone-950 dark:text-stone-300 dark:hover:text-white" title="积分中心">
                     <Coins className="size-3.5" />
                     {(availableMicrocredits / 1_000_000).toLocaleString("zh-CN", { maximumFractionDigits: 3 })}
@@ -94,7 +95,7 @@ export function UserStatusActions({ showConfig = true, variant = "default", onOp
                                 ),
                             },
                             ...(user.role === "admin" ? [{ key: "admin", icon: <ShieldCheck className="size-4" />, label: "管理员后台", onClick: () => navigate("/admin") }] : []),
-                            { key: "wallet", icon: <Coins className="size-4" />, label: "积分中心", onClick: () => navigate("/wallet") },
+                            ...(showCreditUi ? [{ key: "wallet", icon: <Coins className="size-4" />, label: "积分中心", onClick: () => navigate("/wallet") }] : []),
                             { key: "logout", icon: <LogOut className="size-4" />, label: "退出登录", danger: true, onClick: () => void handleLogout() },
                         ],
                     }}

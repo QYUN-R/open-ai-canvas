@@ -6,6 +6,7 @@ import { formatCredits } from "@/constant/credits";
 import { aceternityMotion } from "@/lib/aceternity-motion";
 import { formatTaskKind, statusLabel } from "@/lib/generation-task-display";
 import { canvasThemes } from "@/lib/canvas-theme";
+import { showCreditUi } from "@/lib/self-hosted-mode";
 import type { GenerationTask } from "@/services/api/task-center";
 import { useThemeStore } from "@/stores/use-theme-store";
 
@@ -138,9 +139,9 @@ function ActiveTaskCard({ task, now, theme, expanded, onToggle, reducedMotion }:
                     <motion.div className="h-full rounded-full" animate={{ width: `${progress ?? 8}%` }} transition={reducedMotion ? { duration: 0 } : { duration: 0.3 }} style={{ background: statusTone }} />
                 </div>
 
-                <div className="mt-3 grid grid-cols-2 gap-2 text-[10px]" style={{ color: theme.node.muted }}>
+                <div className={`mt-3 grid gap-2 text-[10px] ${showCreditUi ? "grid-cols-2" : "grid-cols-1"}`} style={{ color: theme.node.muted }}>
                     <span className="inline-flex min-w-0 items-center gap-1 truncate" title={durationLabel}><Clock3 className="size-3 shrink-0" />{durationLabel}</span>
-                    <span className="inline-flex min-w-0 items-center justify-end gap-1 truncate" title={billingLabel}><Coins className="size-3 shrink-0" />{billingLabel}</span>
+                    {showCreditUi ? <span className="inline-flex min-w-0 items-center justify-end gap-1 truncate" title={billingLabel}><Coins className="size-3 shrink-0" />{billingLabel}</span> : null}
                 </div>
             </button>
 

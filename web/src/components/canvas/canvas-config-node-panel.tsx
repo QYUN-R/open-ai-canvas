@@ -6,6 +6,7 @@ import { ModelPicker } from "@/components/model-picker";
 import { configuredModelMatchesCapability, defaultConfig, modelOptionName, resolveModelChannel, useConfigStore, useEffectiveConfig, type AiConfig } from "@/stores/use-config-store";
 import { CreditSymbol, requestCreditCost } from "@/constant/credits";
 import { canvasThemes } from "@/lib/canvas-theme";
+import { showCreditUi } from "@/lib/self-hosted-mode";
 import { normalizeVideoDuration, normalizeVideoResolution } from "@/lib/video-generation-options";
 import { useThemeStore } from "@/stores/use-theme-store";
 import { CanvasImageSettingsPopover } from "./canvas-image-settings-popover";
@@ -168,16 +169,18 @@ export function CanvasConfigNodePanel({ node, isRunning, inputSummary, onConfigC
                         </>
                     ) : (
                         <>
-                            {hasPrice ? (
-                                <span className="inline-flex items-center gap-1">
-                                    <CreditSymbol />
-                                    {credits.toLocaleString()}
-                                </span>
-                            ) : (
-                                <span className="text-xs" title="当前渠道没有模型价格数据">
-                                    无价格
-                                </span>
-                            )}
+                            {showCreditUi ? (
+                                hasPrice ? (
+                                    <span className="inline-flex items-center gap-1">
+                                        <CreditSymbol />
+                                        {credits.toLocaleString()}
+                                    </span>
+                                ) : (
+                                    <span className="text-xs" title="当前渠道没有模型价格数据">
+                                        无价格
+                                    </span>
+                                )
+                            ) : null}
                             <Play className="size-4" />
                             <span>开始生成</span>
                         </>

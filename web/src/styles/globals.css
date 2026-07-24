@@ -112,13 +112,13 @@
     --accent-foreground: oklch(0.985 0 0);
     --destructive: oklch(0.704 0.191 22.216);
     --input: oklch(1 0 0 / 15%);
-    --workspace-canvas: #0b0c0d;
-    --workspace-surface: rgba(20, 21, 22, 0.72);
-    --workspace-surface-strong: rgba(25, 26, 27, 0.9);
+    --workspace-canvas: #0b0d10;
+    --workspace-surface: rgba(21, 24, 29, 0.72);
+    --workspace-surface-strong: rgba(24, 27, 33, 0.92);
     --workspace-border: rgba(255, 255, 255, 0.085);
     --workspace-border-strong: rgba(255, 255, 255, 0.16);
-    --workspace-grid-line: rgba(255, 255, 255, 0.038);
-    --workspace-nav: rgba(11, 12, 13, 0.82);
+    --workspace-grid-line: rgba(232, 237, 245, 0.038);
+    --workspace-nav: rgba(11, 13, 16, 0.82);
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
@@ -196,18 +196,160 @@
         background: #171717;
         /* 非分层的表单 reset 会覆盖 utilities 层颜色，主操作必须固定前景色。 */
         color: #fafafa !important;
-        box-shadow: 0 12px 30px rgba(23, 23, 23, 0.16);
+        box-shadow: 0 12px 30px rgba(23, 23, 23, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.12);
     }
 
     .dark .app-home-primary-action {
-        border-color: #fafafa;
-        background: #fafafa;
+        border-color: rgba(255, 255, 255, 0.92);
+        background: #f4f4f2;
         color: #171717 !important;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 16px 42px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.78);
     }
 
     .app-home-primary-action:not(:disabled):hover {
-        opacity: 0.86;
+        transform: translateY(-1px);
+        opacity: 0.92;
+    }
+
+    .home-cinematic-stage {
+        isolation: isolate;
+    }
+
+    .home-stage-backdrop {
+        animation: home-stage-kenburns 18s ease-in-out infinite alternate;
+    }
+
+    .home-canvas-window {
+        transform: translateZ(0);
+    }
+
+    .home-canvas-drift {
+        animation: home-canvas-drift 22s linear infinite;
+    }
+
+    .home-node-image {
+        transform: scale(1.02);
+        animation: home-node-image-drift 16s ease-in-out infinite alternate;
+    }
+
+    .home-float-a {
+        animation: home-float-a 9s ease-in-out infinite;
+    }
+
+    .home-float-b {
+        animation: home-float-b 10s ease-in-out infinite;
+    }
+
+    .home-float-c {
+        animation: home-float-c 11s ease-in-out infinite;
+    }
+
+    .home-float-d {
+        animation: home-float-d 10s ease-in-out infinite;
+    }
+
+    .home-flow-path {
+        stroke-dasharray: 9 16;
+        animation: home-flow-line 5.6s linear infinite;
+    }
+
+    .home-flow-path-b {
+        animation-duration: 6.4s;
+        animation-delay: -1.8s;
+    }
+
+    .home-flow-path-c {
+        animation-duration: 7.2s;
+        animation-delay: -3s;
+    }
+
+    @keyframes home-stage-kenburns {
+        from {
+            transform: scale(1.04) translate3d(-1.2%, -0.6%, 0);
+        }
+        to {
+            transform: scale(1.11) translate3d(1.2%, 0.8%, 0);
+        }
+    }
+
+    @keyframes home-canvas-drift {
+        from {
+            background-position: 0 0, 0 0;
+        }
+        to {
+            background-position: 64px 0, 0 64px;
+        }
+    }
+
+    @keyframes home-node-image-drift {
+        from {
+            transform: scale(1.02) translate3d(-1%, 0, 0);
+        }
+        to {
+            transform: scale(1.08) translate3d(1%, -1%, 0);
+        }
+    }
+
+    @keyframes home-float-a {
+        0%,
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+        50% {
+            transform: translate3d(8px, -10px, 0);
+        }
+    }
+
+    @keyframes home-float-b {
+        0%,
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+        50% {
+            transform: translate3d(8px, 12px, 0);
+        }
+    }
+
+    @keyframes home-float-c {
+        0%,
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+        50% {
+            transform: translate3d(-10px, -8px, 0);
+        }
+    }
+
+    @keyframes home-float-d {
+        0%,
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+        50% {
+            transform: translate3d(-6px, 10px, 0);
+        }
+    }
+
+    @keyframes home-flow-line {
+        from {
+            stroke-dashoffset: 0;
+        }
+        to {
+            stroke-dashoffset: -50;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .home-stage-backdrop,
+        .home-canvas-drift,
+        .home-node-image,
+        .home-float-a,
+        .home-float-b,
+        .home-float-c,
+        .home-float-d,
+        .home-flow-path {
+            animation: none;
+        }
     }
 
     .app-user-content,
@@ -1361,6 +1503,7 @@
     }
 
     .canvas-node-shell {
+        border-radius: 8px !important;
         transition:
             border-color 160ms ease,
             box-shadow 160ms ease,

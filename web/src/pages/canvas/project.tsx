@@ -42,7 +42,6 @@ import {
     getInputSummary,
     isHiddenBatchChild,
     persistCanvasWorkspaceMode,
-    readCanvasWorkspaceMode,
 } from "@/lib/canvas/canvas-project-domain";
 import {
     deriveStoryboardPipelineProgress,
@@ -191,7 +190,7 @@ function InfiniteCanvasPage() {
     const [showImageInfo, setShowImageInfo] = useState(false);
     const [mediaPerformanceMode, setMediaPerformanceMode] = useState<CanvasMediaPerformanceMode>(readCanvasMediaPerformanceMode);
     const [projectLoaded, setProjectLoaded] = useState(false);
-    const [workspaceMode, setWorkspaceMode] = useState<CanvasWorkspaceMode>(readCanvasWorkspaceMode);
+    const [workspaceMode, setWorkspaceMode] = useState<CanvasWorkspaceMode>("professional");
     const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
     const [shareModalOpen, setShareModalOpen] = useState(false);
     const [nodeSearchOpen, setNodeSearchOpen] = useState(false);
@@ -527,6 +526,23 @@ function InfiniteCanvasPage() {
         setDialogNodeId,
         onNodesDeleted: handleNodesDeleted,
     });
+
+    const openStoryboardWorkspace = useCallback(() => {
+        const target = nodesRef.current.find((node) => node.type === CanvasNodeType.Script);
+        if (!target) {
+            const rect = containerRef.current?.getBoundingClientRect();
+            const localX = size.width >= 760 ? Math.min(size.width - 260, Math.max(420, size.width * 0.54)) : size.width / 2;
+            const localY = size.height >= 520 ? Math.min(size.height - 220, Math.max(220, size.height * 0.45)) : size.height / 2;
+            createNode(CanvasNodeType.Script, screenToCanvas((rect?.left || 0) + localX, (rect?.top || 0) + localY));
+            return;
+        }
+        const selection = new Set([target.id]);
+        selectedNodeIdsRef.current = selection;
+        setSelectedNodeIds(selection);
+        setSelectedConnectionId(null);
+        setDialogNodeId(null);
+        focusCanvasNode(target.id);
+    }, [containerRef, createNode, focusCanvasNode, nodesRef, screenToCanvas, selectedNodeIdsRef, setDialogNodeId, setSelectedConnectionId, setSelectedNodeIds, size.height, size.width]);
 
     const {
         cancelPendingConnectionCreate,
@@ -1198,6 +1214,7 @@ function InfiniteCanvasPage() {
                     title={currentProject?.title || "未命名画布"}
                     workspaceMode={workspaceMode}
                     onWorkspaceModeChange={setWorkspaceMode}
+                    onOpenStoryboard={openStoryboardWorkspace}
                     titleDraft={titleDraft}
                     isTitleEditing={titleEditing}
                     onTitleDraftChange={setTitleDraft}
@@ -1423,7 +1440,7 @@ function InfiniteCanvasPage() {
 
                 {isMiniMapOpen ? <Minimap nodes={nodes} viewport={viewport} viewportSize={size} canvasContainerRef={containerRef} onViewportPreviewChange={previewViewport} onViewportChange={handleViewportChange} /> : null}
 
-                <div data-canvas-no-zoom className="absolute bottom-4 left-4 z-50 flex items-end gap-2" onMouseDown={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()} onWheel={(event) => event.stopPropagation()}>
+                <div data-canvas-no-zoom className="absolute bottom-4 left-[86px] z-50 flex items-end gap-2" onMouseDown={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()} onWheel={(event) => event.stopPropagation()}>
                     <CanvasZoomControls scale={viewport.k} containerRef={containerRef} onScaleChange={setZoomScale} onReset={resetViewport} isMiniMapOpen={isMiniMapOpen} onToggleMiniMap={() => setIsMiniMapOpen((value) => !value)} onOpenShortcuts={() => setShortcutRequestNonce((value) => value + 1)} />
                     <CanvasAssetTray assetImages={imageAssets} canvasImages={canvasImageNodes} activeNodeId={selectedNodeIds.size === 1 ? Array.from(selectedNodeIds)[0] : null} onInsertAssetImage={(asset) => void createImageAssetNode(asset)} onFocusCanvasImage={focusCanvasImageNode} />
                 </div>

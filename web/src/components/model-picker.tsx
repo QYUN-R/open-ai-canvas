@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useState } from "react";
 import { Coins, Cpu } from "lucide-react";
 
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger } from "@/components/ui/select";
+import { showCreditUi } from "@/lib/self-hosted-mode";
 import { cn } from "@/lib/utils";
 import { modelOptionLabel, modelOptionName, resolveModelChannel, selectableModelsByCapability, type AiConfig, type ModelCapability } from "@/stores/use-config-store";
 
@@ -144,6 +145,7 @@ function modelMenuPrice(config: AiConfig, model: string): number | null | undefi
 }
 
 function ModelPrice({ price, compact = false }: { price: number | null | undefined; compact?: boolean }) {
+    if (!showCreditUi) return null;
     if (price === undefined) return null;
     if (price === null) return compact ? null : <span className="shrink-0 text-[10px] text-amber-600 dark:text-amber-300">未配置</span>;
     return (

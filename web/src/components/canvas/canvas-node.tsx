@@ -286,7 +286,7 @@ export const CanvasNode = React.memo(function CanvasNode({
         >
             <CometCard
                 containerClassName="overflow-visible"
-                className={`canvas-node-shell relative h-full w-full overflow-visible rounded-[18px] border ${isGeneratingNode ? "canvas-node-shell-generating" : ""}`}
+                className={`canvas-node-shell relative h-full w-full overflow-visible rounded-lg border ${isGeneratingNode ? "canvas-node-shell-generating" : ""}`}
                 rotateDepth={cometDepth}
                 translateDepth={cometTranslate}
                 disabled={cometDisabled}
@@ -797,7 +797,7 @@ function VideoNodeContent({ node, theme, reduceMediaEffects }: NodeContentRender
     if (!url) {
         return <DeferredMediaLoad icon={loading ? <LoaderCircle className="size-5 animate-spin" /> : <Play className="size-5 fill-current" />} label={loading ? "正在缓存视频" : "加载并缓存视频"} disabled={loading} onClick={() => { playWhenReadyRef.current = true; void load(); }} />;
     }
-    return <video ref={videoRef} src={url} controls preload={reduceMediaEffects ? "none" : "metadata"} className="h-full w-full rounded-[18px] bg-black object-contain" data-canvas-no-zoom />;
+    return <video ref={videoRef} src={url} controls preload={reduceMediaEffects ? "none" : "metadata"} className="h-full w-full rounded-lg bg-black object-contain" data-canvas-no-zoom />;
 }
 
 function AudioNodeContent({ node, theme }: NodeContentRendererProps) {
@@ -858,7 +858,7 @@ function ImageContent({
 
     return (
         <BatchFrame batchCount={isBatchRoot ? batchCount : 0} batchExpanded={batchExpanded} batchOpening={batchOpening} batchRecovering={batchRecovering} theme={theme} onToggleBatch={onToggleBatch}>
-            <div ref={imageContainerRef} className="h-full w-full overflow-hidden rounded-[16px]">
+            <div ref={imageContainerRef} className="h-full w-full overflow-hidden rounded-md">
                 {url ? (
                     <img
                         src={url}
@@ -910,7 +910,7 @@ function ImageContent({
 
 function DeferredMediaLoad({ icon, label, disabled, onClick }: { icon: ReactNode; label: string; disabled: boolean; onClick: () => void }) {
     return (
-        <button type="button" data-canvas-no-zoom className="flex size-full flex-col items-center justify-center gap-2 rounded-[16px] bg-black text-white/75 transition hover:text-white disabled:cursor-wait" disabled={disabled} onClick={(event) => { event.stopPropagation(); onClick(); }} onMouseDown={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
+        <button type="button" data-canvas-no-zoom className="flex size-full flex-col items-center justify-center gap-2 rounded-md bg-black text-white/75 transition hover:text-white disabled:cursor-wait" disabled={disabled} onClick={(event) => { event.stopPropagation(); onClick(); }} onMouseDown={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
             <span className="grid size-10 place-items-center rounded-full bg-white/10">{icon}</span>
             <span className="text-xs font-medium">{label}</span>
         </button>
