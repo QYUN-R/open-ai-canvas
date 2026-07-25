@@ -1,11 +1,12 @@
 import { Canvas, useThree } from "@react-three/fiber";
 import { Grid, OrbitControls, TransformControls } from "@react-three/drei";
 import { forwardRef, Suspense, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { Box3, Color, Group, Mesh, MeshDepthMaterial, MeshNormalMaterial, Object3D, PerspectiveCamera, Scene, Texture, TextureLoader, Vector3, WebGLRenderer } from "three";
+import { Box3, Color, DoubleSide, Group, LinearFilter, Mesh, MeshDepthMaterial, MeshNormalMaterial, Object3D, PerspectiveCamera, Scene, SRGBColorSpace, Texture, TextureLoader, Vector3, WebGLRenderer } from "three";
 import { GLTFLoader } from "three-stdlib";
 
 import { interpolateDirectorTransform } from "@/lib/canvas/director/director-scene";
 import { resolveMediaUrl } from "@/services/file-storage";
+import { resolveImageUrl } from "@/services/image-storage";
 import type { DirectorCamera, DirectorLight, DirectorObject, DirectorRenderMode, DirectorScene, DirectorTransform } from "@/types/director";
 
 export type DirectorViewportHandle = {
@@ -56,6 +57,7 @@ function DirectorSceneContent({ scene, selectedObjectId, transformMode, renderMo
     const [transforming, setTransforming] = useState(false);
     const shot = scene.shots.find((item) => item.id === scene.activeShotId) || scene.shots[0];
     const activeCamera = scene.cameras.find((item) => item.id === shot?.cameraId) || scene.cameras[0];
+    const hasEnvironment = scene.objects.some((item) => item.kind === "environment" && item.visible);
 
     useEffect(() => {
         onCaptureContext({ gl, camera: camera as PerspectiveCamera, scene: threeScene });
@@ -84,7 +86,7 @@ function DirectorSceneContent({ scene, selectedObjectId, transformMode, renderMo
             {scene.gridVisible ? <Grid position={[0, 0, 0]} infiniteGrid fadeDistance={40} fadeStrength={5} cellSize={0.5} sectionSize={5} cellColor="#8f99a3" sectionColor="#626d77" /> : null}
             <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, -0.012, 0]}>
                 <planeGeometry args={[120, 120]} />
-                <meshStandardMaterial color="#aeb7bf" roughness={0.92} />
+                <meshStandardMaterial color={hasEnvironment ? "#0b111b" : "#aeb7bf"} roughness={0.92} />
             </mesh>
             {scene.objects.filter((item) => item.visible).map((object) => (
                 <DirectorObjectView
@@ -124,6 +126,13 @@ function CameraSync({ camera, playhead }: { camera?: DirectorCamera; playhead: n
 function DirectorObjectView({ object, selected, transformMode, playhead, onSelect, onTransforming, onTransform }: { object: DirectorObject; selected: boolean; transformMode: DirectorViewportProps["transformMode"]; playhead: number; onSelect: () => void; onTransforming: (value: boolean) => void; onTransform: (transform: DirectorTransform) => void }) {
     const groupRef = useRef<Group>(null);
     const transform = interpolateDirectorTransform(object.transform, object.keyframes, playhead);
+    if (object.kind === "environment") {
+        return (
+            <group ref={groupRef} position={transform.position} rotation={transform.rotation} scale={transform.scale}>
+                <DirectorObjectVisual object={object} selected={false} />
+            </group>
+        );
+    }
     const content = (
         <group
             ref={groupRef}
@@ -158,6 +167,7 @@ function DirectorObjectView({ object, selected, transformMode, playhead, onSelec
 
 function DirectorObjectVisual({ object, selected }: { object: DirectorObject; selected: boolean }) {
     if (object.kind === "model" && object.url) return <DirectorModel object={object} selected={selected} />;
+    if (object.kind === "environment" && object.url) return <DirectorEnvironment object={object} selected={selected} />;
     if (object.kind === "billboard" && object.url) return <DirectorBillboard object={object} selected={selected} />;
     if (object.primitive === "character") return <DirectorCharacter object={object} selected={selected} />;
     const material = <meshStandardMaterial color={selected ? "#2f8cff" : object.color} roughness={0.68} metalness={0.05} />;
@@ -220,18 +230,110 @@ function DirectorModel({ object, selected }: { object: DirectorObject; selected:
 }
 
 function DirectorBillboard({ object, selected }: { object: DirectorObject; selected: boolean }) {
-    const [texture, setTexture] = useState<Texture | null>(null);
-    useEffect(() => {
-        let active = true;
-        new TextureLoader().load(object.url!, (next) => active && setTexture(next), undefined, () => active && setTexture(null));
-        return () => { active = false; };
-    }, [object.url]);
+    const texture = useDirectorImageTexture(object);
     return (
         <mesh castShadow={object.castShadow}>
             <planeGeometry args={[1.6, 1]} />
-            <meshBasicMaterial map={texture || undefined} color={texture ? "#ffffff" : selected ? "#2f8cff" : object.color} toneMapped={false} />
+            <meshBasicMaterial key={texture?.uuid || "empty"} map={texture || undefined} color={texture ? "#ffffff" : selected ? "#2f8cff" : object.color} toneMapped={false} side={DoubleSide} />
         </mesh>
     );
+}
+
+function DirectorEnvironment({ object, selected }: { object: DirectorObject; selected: boolean }) {
+    const texture = useDirectorImageTexture(object);
+    const textures = useMemo(() => {
+        if (!texture) return null;
+        return {
+            back: cloneTexture(texture, { repeat: [1, 1], offset: [0, 0] }),
+            floor: cloneTexture(texture, { repeat: [1, 0.42], offset: [0, 0] }),
+            left: cloneTexture(texture, { repeat: [0.36, 1], offset: [0, 0] }),
+            right: cloneTexture(texture, { repeat: [0.36, 1], offset: [0.64, 0] }),
+        };
+    }, [texture]);
+
+    useEffect(() => () => {
+        textures?.back.dispose();
+        textures?.floor.dispose();
+        textures?.left.dispose();
+        textures?.right.dispose();
+    }, [textures]);
+
+    const fallbackColor = selected ? "#2f8cff" : "#141a24";
+    const backMap = textures?.back || undefined;
+    const floorMap = textures?.floor || undefined;
+    const leftMap = textures?.left || undefined;
+    const rightMap = textures?.right || undefined;
+
+    return (
+        <group>
+            <mesh position={[0, 2.8, -6]} receiveShadow={false}>
+                <planeGeometry args={[10.8, 5.6]} />
+                <meshBasicMaterial map={backMap} color={backMap ? "#ffffff" : fallbackColor} toneMapped={false} side={DoubleSide} />
+            </mesh>
+            <mesh position={[0, 0.018, -0.35]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+                <planeGeometry args={[10.8, 11.4]} />
+                <meshBasicMaterial map={floorMap} color={floorMap ? "#58606c" : "#202630"} toneMapped={false} side={DoubleSide} />
+            </mesh>
+            <mesh position={[-5.4, 2.8, -0.35]} rotation={[0, Math.PI / 2, 0]}>
+                <planeGeometry args={[11.4, 5.6]} />
+                <meshBasicMaterial map={leftMap} color={leftMap ? "#697080" : "#171d28"} toneMapped={false} side={DoubleSide} />
+            </mesh>
+            <mesh position={[5.4, 2.8, -0.35]} rotation={[0, -Math.PI / 2, 0]}>
+                <planeGeometry args={[11.4, 5.6]} />
+                <meshBasicMaterial map={rightMap} color={rightMap ? "#697080" : "#171d28"} toneMapped={false} side={DoubleSide} />
+            </mesh>
+            <mesh position={[0, 5.62, -0.35]} rotation={[Math.PI / 2, 0, 0]}>
+                <planeGeometry args={[10.8, 11.4]} />
+                <meshBasicMaterial color="#070a10" toneMapped={false} side={DoubleSide} />
+            </mesh>
+        </group>
+    );
+}
+
+function useDirectorImageTexture(object: DirectorObject) {
+    const [texture, setTexture] = useState<Texture | null>(null);
+    const invalidate = useThree((state) => state.invalidate);
+    useEffect(() => {
+        invalidate();
+    }, [invalidate, texture]);
+    useEffect(() => {
+        let active = true;
+        setTexture(null);
+        void resolveImageUrl(object.storageKey, object.url || "", { cacheMiss: true }).then((url) => {
+            if (!active || !url) return;
+            new TextureLoader().load(
+                url,
+                (next) => {
+                    if (!active) return;
+                    next.colorSpace = SRGBColorSpace;
+                    next.minFilter = LinearFilter;
+                    next.magFilter = LinearFilter;
+                    next.needsUpdate = true;
+                    setTexture(next);
+                    invalidate();
+                },
+                undefined,
+                () => {
+                    if (!active) return;
+                    setTexture(null);
+                    invalidate();
+                },
+            );
+        });
+        return () => {
+            active = false;
+        };
+    }, [invalidate, object.storageKey, object.url]);
+    return texture;
+}
+
+function cloneTexture(texture: Texture, options: { repeat: [number, number]; offset: [number, number] }) {
+    const next = texture.clone();
+    next.colorSpace = SRGBColorSpace;
+    next.repeat.set(...options.repeat);
+    next.offset.set(...options.offset);
+    next.needsUpdate = true;
+    return next;
 }
 
 function DirectorLightView({ light }: { light: DirectorLight }) {

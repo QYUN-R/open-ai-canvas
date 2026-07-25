@@ -52,6 +52,10 @@ export function createDirectorBillboard(name: string, url: string, storageKey?: 
     return { ...createDirectorObject("plane", name, [0, 1.1, 0], "#ffffff"), kind: "billboard", url, storageKey, sourceNodeId, transform: { position: [0, 1.1, 0], rotation: [0, 0, 0], scale: [1.6, 0.9, 1] } };
 }
 
+export function createDirectorEnvironment(name: string, url: string, storageKey?: string, sourceNodeId?: string): DirectorObject {
+    return { ...createDirectorObject("plane", name, [0, 0, 0], "#ffffff"), kind: "environment", url, storageKey, sourceNodeId, castShadow: false, receiveShadow: false, transform: directorIdentityTransform([0, 0, 0]) };
+}
+
 export function createDirectorCamera(name = "主摄影机"): DirectorCamera {
     return { id: nanoid(), name, transform: directorIdentityTransform([4.8, 2.7, 6.8]), target: [0, 1, 0], focalLength: 35, fov: 50, aperture: 2.8, focusDistance: 5, near: 0.05, far: 500, keyframes: [] };
 }

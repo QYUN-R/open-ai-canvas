@@ -7,7 +7,7 @@ export type DirectorTransform = {
 };
 
 export type DirectorPrimitiveKind = "box" | "sphere" | "cylinder" | "plane" | "character";
-export type DirectorObjectKind = "primitive" | "model" | "billboard";
+export type DirectorObjectKind = "primitive" | "model" | "billboard" | "environment";
 export type DirectorPose = "neutral" | "stand" | "walk" | "run" | "sit" | "action";
 export type DirectorCameraMove = "static" | "push_in" | "pull_out" | "pan_left" | "pan_right" | "tilt_up" | "tilt_down" | "orbit_left" | "orbit_right" | "handheld";
 export type DirectorShotSize = "extreme_wide" | "wide" | "full" | "medium" | "close_up" | "extreme_close_up";
