@@ -12,3 +12,5 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        SELF_HOSTED_MODE: ${SELF_HOSTED_MODE:-false}

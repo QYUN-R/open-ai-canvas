@@ -4,6 +4,8 @@
 FROM oven/bun:1.3.13 AS web-build
 
 WORKDIR /app/web
+ARG SELF_HOSTED_MODE=false
+ENV SELF_HOSTED_MODE=$SELF_HOSTED_MODE
 COPY web/package.json web/bun.lock ./
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --cache-dir=/root/.bun/install/cache
 COPY VERSION /app/VERSION
