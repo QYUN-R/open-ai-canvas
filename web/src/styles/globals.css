@@ -518,6 +518,269 @@
         caret-color: #f5f5f5;
     }
 
+    .auth-cinematic-stage {
+        isolation: isolate;
+    }
+
+    .auth-cinematic-stage::before,
+    .auth-cinematic-stage::after {
+        position: absolute;
+        inset: 0;
+        content: "";
+        pointer-events: none;
+    }
+
+    .auth-cinematic-stage::before {
+        z-index: 4;
+        opacity: 0.2;
+        background:
+            repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 5px),
+            repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 11px);
+        mix-blend-mode: soft-light;
+        animation: auth-frame-grain 1.8s steps(2, end) infinite;
+    }
+
+    .auth-cinematic-stage::after {
+        z-index: 5;
+        background:
+            linear-gradient(90deg, rgba(0, 0, 0, 0.82), transparent 24%, transparent 68%, rgba(0, 0, 0, 0.74)),
+            linear-gradient(180deg, rgba(0, 0, 0, 0.52), transparent 28%, rgba(0, 0, 0, 0.86));
+    }
+
+    .auth-stage-backdrop {
+        opacity: 0.68;
+        filter: saturate(0.84) contrast(1.08) brightness(0.92);
+        transform-origin: center;
+        animation: auth-stage-kenburns 22s ease-in-out infinite alternate;
+    }
+
+    .auth-stage-drift {
+        animation: auth-stage-drift 24s linear infinite;
+    }
+
+    .auth-card-image {
+        transform: scale(1.03);
+        animation: auth-card-image-drift 15s ease-in-out infinite alternate;
+    }
+
+    @keyframes auth-stage-kenburns {
+        from {
+            transform: scale(1.05) translate3d(-1.4%, -0.6%, 0);
+        }
+        to {
+            transform: scale(1.14) translate3d(1.1%, 0.8%, 0);
+        }
+    }
+
+    @keyframes auth-frame-grain {
+        0%,
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+        50% {
+            transform: translate3d(-1%, 1%, 0);
+        }
+    }
+
+    @keyframes auth-stage-sweep {
+        0%,
+        42%,
+        100% {
+            transform: translate3d(-26%, 0, 0);
+        }
+        58% {
+            transform: translate3d(26%, 0, 0);
+        }
+    }
+
+    @keyframes auth-stage-drift {
+        from {
+            background-position: 0 0, 0 0;
+        }
+        to {
+            background-position: 72px 0, 0 72px;
+        }
+    }
+
+    @keyframes auth-card-image-drift {
+        from {
+            transform: scale(1.03) translate3d(-0.8%, 0, 0);
+        }
+        to {
+            transform: scale(1.1) translate3d(1%, -1%, 0);
+        }
+    }
+
+    .auth-cinema-frame {
+        z-index: 8;
+        inset: 10% 7% 36%;
+        overflow: hidden;
+        transform: translateZ(0);
+    }
+
+    .auth-cinema-frame::before,
+    .auth-cinema-frame::after {
+        position: absolute;
+        content: "";
+        pointer-events: none;
+    }
+
+    .auth-cinema-frame::before {
+        z-index: 1;
+        inset: 0;
+        border-radius: inherit;
+        background:
+            radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.16), transparent 25%),
+            radial-gradient(circle at 52% 106%, rgba(103, 232, 249, 0.16), transparent 34%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 18%, transparent 78%, rgba(0, 0, 0, 0.42));
+        opacity: 0.5;
+    }
+
+    .auth-cinema-frame::after {
+        z-index: 3;
+        inset: -42% -58%;
+        background: linear-gradient(116deg, transparent 38%, rgba(255, 255, 255, 0.18) 48%, transparent 58%);
+        opacity: 0.32;
+        animation: auth-stage-sweep 8.8s ease-in-out infinite;
+    }
+
+    .auth-frame-perf {
+        position: absolute;
+        top: 16px;
+        bottom: 16px;
+        z-index: 6;
+        width: 10px;
+        opacity: 0.38;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.86) 0 2px, transparent 2.6px) center top / 10px 26px repeat-y;
+    }
+
+    .auth-frame-perf-left {
+        left: 16px;
+    }
+
+    .auth-frame-perf-right {
+        right: 16px;
+    }
+
+    .auth-shot-stack {
+        perspective: 800px;
+    }
+
+    .auth-frame-hero {
+        transform: translateZ(0);
+    }
+
+    .auth-frame-hero::after {
+        position: absolute;
+        inset: 0;
+        content: "";
+        background:
+            linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.18) 52%, rgba(0, 0, 0, 0.62) 100%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 28%, rgba(0, 0, 0, 0.44));
+        pointer-events: none;
+    }
+
+    .auth-shot-card {
+        transform-origin: center right;
+        animation: auth-shot-card-float 8.4s ease-in-out infinite;
+    }
+
+    .auth-shot-card:nth-child(2) {
+        margin-left: 22px;
+        animation-duration: 9.2s;
+    }
+
+    .auth-shot-card:nth-child(3) {
+        margin-left: 42px;
+        animation-duration: 10s;
+    }
+
+    .auth-director-note {
+        animation: auth-director-note 9.6s ease-in-out infinite;
+    }
+
+    .auth-frame-playhead::after {
+        position: absolute;
+        top: -2px;
+        left: 0;
+        width: 38%;
+        height: 5px;
+        content: "";
+        border-radius: 999px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+        animation: auth-playhead 4.2s ease-in-out infinite;
+    }
+
+    @keyframes auth-shot-card-float {
+        0%,
+        100% {
+            transform: translate3d(0, 0, 0) rotateY(-2deg);
+        }
+        50% {
+            transform: translate3d(-6px, -8px, 0) rotateY(3deg);
+        }
+    }
+
+    @keyframes auth-director-note {
+        0%,
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+        50% {
+            transform: translate3d(8px, -6px, 0);
+        }
+    }
+
+    @keyframes auth-playhead {
+        0%,
+        100% {
+            transform: translateX(0);
+            opacity: 0.32;
+        }
+        50% {
+            transform: translateX(164%);
+            opacity: 0.9;
+        }
+    }
+
+    @media (max-width: 1279px) {
+        .auth-director-note {
+            display: none;
+        }
+    }
+
+    @media (max-width: 1023px) {
+        .auth-cinema-frame {
+            inset: 24% 5% 32%;
+        }
+
+        .auth-shot-stack {
+            top: 32%;
+            width: 170px;
+        }
+
+        .auth-frame-hero {
+            width: 46%;
+        }
+
+        .auth-shot-card:nth-child(3) {
+            display: none;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .auth-cinema-frame {
+            inset: 28% 5% 36%;
+        }
+
+        .auth-frame-perf,
+        .auth-frame-hero,
+        .auth-shot-stack,
+        .auth-frame-playhead {
+            display: none;
+        }
+    }
+
     :where(.ant-modal, .ant-drawer, .ant-select-dropdown, .ant-dropdown, .ant-popover) {
         overscroll-behavior: contain;
     }
@@ -533,6 +796,17 @@
 
         :where(.ant-input, .ant-input-affix-wrapper, .ant-input-number, .ant-select-selector) {
             transition: none !important;
+        }
+
+        .auth-stage-backdrop,
+        .auth-cinematic-stage::before,
+        .auth-cinema-frame::after,
+        .auth-stage-drift,
+        .auth-card-image,
+        .auth-shot-card,
+        .auth-director-note,
+        .auth-frame-playhead::after {
+            animation: none;
         }
     }
 
