@@ -6,6 +6,7 @@ import { FRAME_HEADER_HEIGHT, getFrameChildIds, getFrameChildren, isFrameNode } 
 import { alignCanvasNodes, layoutCanvasFlow, layoutCanvasNodes, nextCanvasVersionLabel, type CanvasAlignmentMode } from "@/lib/canvas/canvas-layout";
 import { createCanvasNode, removeCanvasNodes } from "@/lib/canvas/canvas-project-domain";
 import { getGenerationCount } from "@/lib/canvas/canvas-project-generation";
+import { createProductionAssetPack, type CanvasProductionAssetKind } from "@/lib/canvas/canvas-production-assets";
 import { useEffectiveConfig } from "@/stores/use-config-store";
 import { CanvasNodeType, type CanvasConnection, type CanvasNodeData, type CanvasNodeMetadata, type ContextMenuState, type Position } from "@/types/canvas";
 
@@ -197,6 +198,20 @@ export function useCanvasNodeOperations({
         message.success(`已创建 ${media.length} 项引用组，折叠后可作为路由节点`);
     }, [commitNodes, message, nodesRef, selectNodes, selectedNodeIdsRef]);
 
+    const createProductionAsset = useCallback((kind: CanvasProductionAssetKind) => {
+        const existingAssetFrames = nodesRef.current.filter((node) => isFrameNode(node) && isProductionAssetWorkflow(node.metadata?.workflowTitle)).length;
+        const baseCenter = getCanvasCenter();
+        const result = createProductionAssetPack(kind, {
+            x: baseCenter.x + (existingAssetFrames % 2) * 1120,
+            y: baseCenter.y + Math.floor(existingAssetFrames / 2) * 760,
+        });
+        commitNodes([...nodesRef.current, ...result.nodes]);
+        commitConnections([...connectionsRef.current, ...result.connections]);
+        selectNodes(new Set([result.frameId]));
+        const label = kind === "character" ? "角色资产" : kind === "panorama" ? "720 全景场景" : "场景资产";
+        message.success(`已创建 ${label}`);
+    }, [commitConnections, commitNodes, connectionsRef, getCanvasCenter, message, nodesRef, selectNodes]);
+
     const toggleNodeLocked = useCallback((nodeId: string) => {
         const target = nodesRef.current.find((node) => node.id === nodeId);
         if (!target) return;
@@ -341,6 +356,7 @@ export function useCanvasNodeOperations({
         copyNodesToClipboard,
         copySelectedNodes,
         createNode,
+        createProductionAsset,
         createReferenceGroup,
         createStoryboardGroup,
         deleteConnection,
@@ -351,4 +367,8 @@ export function useCanvasNodeOperations({
         setPrimaryVersion,
         toggleNodeLocked,
     };
+}
+
+function isProductionAssetWorkflow(value?: string) {
+    return value === "角色资产" || value === "场景资产" || value === "720 全景";
 }

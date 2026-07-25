@@ -479,6 +479,7 @@ function InfiniteCanvasPage() {
         copyNodesToClipboard,
         copySelectedNodes,
         createNode,
+        createProductionAsset,
         createReferenceGroup,
         createStoryboardGroup,
         deleteConnection,
@@ -1491,6 +1492,9 @@ function InfiniteCanvasPage() {
                     onAddText={() => createNode(CanvasNodeType.Text)}
                     onAddNovel={createNovelNode}
                     onCreatePipeline={createShortDramaPipeline}
+                    onCreateCharacterAsset={() => createProductionAsset("character")}
+                    onCreateSceneAsset={() => createProductionAsset("scene")}
+                    onCreatePanoramaAsset={() => createProductionAsset("panorama")}
                     onChooseStyle={() => setStylePickerOpen(true)}
                     onAddScript={() => createNode(CanvasNodeType.Script)}
                     onAddFrame={() => createNode(CanvasNodeType.Frame)}

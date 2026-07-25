@@ -60,6 +60,9 @@ export function CanvasToolbar({
     onAddText,
     onAddNovel,
     onCreatePipeline,
+    onCreateCharacterAsset,
+    onCreateSceneAsset,
+    onCreatePanoramaAsset,
     onChooseStyle,
     onAddScript,
     onAddFrame,
@@ -87,6 +90,9 @@ export function CanvasToolbar({
     onAddText: () => void;
     onAddNovel: () => void;
     onCreatePipeline: () => void;
+    onCreateCharacterAsset: () => void;
+    onCreateSceneAsset: () => void;
+    onCreatePanoramaAsset: () => void;
     onChooseStyle: () => void;
     onAddScript: () => void;
     onAddFrame: () => void;
@@ -173,6 +179,9 @@ export function CanvasToolbar({
                         onAddText={() => runAddAction(onAddText)}
                         onAddNovel={() => runAddAction(onAddNovel)}
                         onCreatePipeline={() => runAddAction(onCreatePipeline)}
+                        onCreateCharacterAsset={() => runAddAction(onCreateCharacterAsset)}
+                        onCreateSceneAsset={() => runAddAction(onCreateSceneAsset)}
+                        onCreatePanoramaAsset={() => runAddAction(onCreatePanoramaAsset)}
                         onChooseStyle={() => runAddAction(onChooseStyle)}
                         onAddScript={() => runAddAction(onAddScript)}
                         onAddFrame={() => runAddAction(onAddFrame)}
@@ -266,6 +275,9 @@ function AddNodeMenu({
     onAddText,
     onAddNovel,
     onCreatePipeline,
+    onCreateCharacterAsset,
+    onCreateSceneAsset,
+    onCreatePanoramaAsset,
     onChooseStyle,
     onAddScript,
     onAddFrame,
@@ -282,6 +294,9 @@ function AddNodeMenu({
     onAddText: () => void;
     onAddNovel: () => void;
     onCreatePipeline: () => void;
+    onCreateCharacterAsset: () => void;
+    onCreateSceneAsset: () => void;
+    onCreatePanoramaAsset: () => void;
     onChooseStyle: () => void;
     onAddScript: () => void;
     onAddFrame: () => void;
@@ -306,11 +321,11 @@ function AddNodeMenu({
         { id: "novel", label: "小说", description: "长文本拆解", icon: <FileText />, onClick: onAddNovel },
         { id: "style", label: "画风", description: "项目视觉规范", icon: <Palette />, onClick: onChooseStyle },
         { id: "director", label: "导演台", description: "3D 机位与镜头", icon: <Layers3 />, badge: "3D", onClick: onOpenDirector },
-        { id: "character", label: "角色", icon: <UserRound />, ...comingSoon("P3") },
-        { id: "scene", label: "场景", icon: <Map />, ...comingSoon("P3") },
+        { id: "character", label: "角色资产", description: "设定卡 / 三视图", icon: <UserRound />, badge: "资产", onClick: onCreateCharacterAsset },
+        { id: "scene", label: "场景资产", description: "空间 / 光线 / 锚点", icon: <Map />, badge: "资产", onClick: onCreateSceneAsset },
         { id: "shot-group", label: "分镜组", icon: <Film />, disabled: true, badge: "已支持", description: "选择图片后用多选工具创建", onClick: () => undefined },
         { id: "shot-learn", label: "镜头学习", icon: <Camera />, ...comingSoon("P7") },
-        { id: "panorama", label: "720 全景", icon: <Box />, ...comingSoon("P4") },
+        { id: "panorama", label: "720 全景", description: "全景场景资产", icon: <Box />, badge: "资产", onClick: onCreatePanoramaAsset },
         { id: "composer", label: "视频合成", icon: <Film />, ...comingSoon("P6") },
         { id: "audio-tools", label: "音频处理", icon: <Mic2 />, ...comingSoon("P6") },
     ];
